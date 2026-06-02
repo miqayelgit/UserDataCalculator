@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="UserDataCalculator.Application/UserDataCalculator.Application.csproj" />
+  <Project Path="UserDataCalculator/UserDataCalculator.csproj" />
+</Solution>
