@@ -14,11 +14,11 @@ public class CalculateUserDataController : ControllerBase
     {
         _userDataCalculator = userDataCalculator;
     }
+
     [HttpPost]
     public async Task<IActionResult> GetCalculationResult([FromBody] CalculateUserDataDto dto)
     {
         var res = _userDataCalculator.CalculateUserDailyCalorieLimitsAsync(dto);
-
         return Ok(res);
     }
 }

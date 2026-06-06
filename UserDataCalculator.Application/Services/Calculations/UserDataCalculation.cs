@@ -9,7 +9,7 @@ public class UserDataCalculation : IUserDataCalculation
 {
     public CalculationResultsDto CalculateUserDailyCalorieLimitsAsync(CalculateUserDataDto dto)
     {
-        var decisive = dto.Gender == "Male" ? 5 : -161;
+        var decisive = dto.Gender == "Male" ? 5 : -161; //add enum
 
         var BMR = 10 * dto.Weight + 6.25 * dto.Height - 5 * dto.Age + decisive + dto.AdditionalCalories;
 
