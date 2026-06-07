@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using UserDataCalculator.Application.DTOs;
+using UserDataCalculator.Application.Enums;
 
 namespace UserDataCalculator.Validators;
 
@@ -13,8 +14,7 @@ public class CalculateUserDataDtoValidator : AbstractValidator<CalculateUserData
             .InclusiveBetween(1, 10);
 
         RuleFor(x => x.AdditionalCalories)
-            .NotNull()
-            .NotEmpty();
+            .NotNull();
 
         RuleFor(x => x.Height)
             .NotNull()
@@ -33,8 +33,7 @@ public class CalculateUserDataDtoValidator : AbstractValidator<CalculateUserData
 
         RuleFor(x => x.Gender)
             .NotNull()
-            .NotEmpty()
-            .MaximumLength(6);
+            .IsInEnum();
 
         RuleFor(x => x.ProteinPercent)
             .NotNull()

@@ -1,7 +1,8 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
-using UserDataCalculator.Application.Contracts;
-using UserDataCalculator.Application.Services.Calculations;
+using UserDataCalculator.Application.Extensions;
+using UserDataCalculator.Middleware;
 using UserDataCalculator.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,9 +12,33 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("ApiKey", new()
+    {
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Name = "x-api-key",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "API Key"
+    });
 
-builder.Services.AddScoped<IUserDataCalculation, UserDataCalculation>();
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            new List<string>()
+        }
+    });
+});
+
+builder.Services.AddUserDataServices();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -32,10 +57,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             Success = false,
             Message = "Validation failed",
             Name = "Poghos",
-            Errors = errors
+            Errors = errors.FirstOrDefault()
         });
     };
 });
+
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(CalculateUserDataDtoValidator).Assembly);
 
 var app = builder.Build();
@@ -47,7 +74,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
+app.UseMiddleware<ApiKeyValidatorMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
